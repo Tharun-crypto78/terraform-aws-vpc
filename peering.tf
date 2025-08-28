@@ -1,8 +1,8 @@
 resource "aws_vpc_peering_connection" "default" {
   count = var.is_peering_required ? 1 : 0
-  
   peer_vpc_id   = data.aws_vpc.default.id  #this is the acceptor vpc which is default here
   vpc_id        = aws_vpc.main.id # this is requester
+  auto_accept = true
 
   accepter {
     allow_remote_vpc_dns_resolution = true
@@ -12,13 +12,11 @@ resource "aws_vpc_peering_connection" "default" {
     allow_remote_vpc_dns_resolution = true
   }
 
-  auto_accept = true
-
-  tags = merge(
+  tags = merge (
     var.vpc_peering_tags,
     local.common_tags,
     {
-        Name = "${var.project}-${var.environment}-default"
+        Name = "${var.project}-${var.environment}-peering"
     }
   )
 }
@@ -26,25 +24,25 @@ resource "aws_vpc_peering_connection" "default" {
 resource "aws_route" "public_peering" {
   count = var.is_peering_required ? 1 : 0
   route_table_id            = aws_route_table.public.id
-  destination_cidr_block    = data.aws_vpc.default.cidr_block
+  destination_cidr_block    = data.aws_vpc.default_vpc.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.default[count.index].id
 }
 
 resource "aws_route" "private_peering" {
   count = var.is_peering_required ? 1 : 0
   route_table_id            = aws_route_table.private.id
-  destination_cidr_block    = data.aws_vpc.default.cidr_block
+  destination_cidr_block    = data.aws_vpc.default_vpc.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.default[count.index].id
 }
 
 resource "aws_route" "database_peering" {
   count = var.is_peering_required ? 1 : 0
   route_table_id            = aws_route_table.database.id
-  destination_cidr_block    = data.aws_vpc.default.cidr_block
+  destination_cidr_block    = data.aws_vpc.default_vpc.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.default[count.index].id
 }
 
-# we should add peering connection to default VPC main route table too
+# we should add peering connection in default VPC main route table too
 resource "aws_route" "default_peering" {
   count = var.is_peering_required ? 1 : 0
   route_table_id            = data.aws_route_table.main.id

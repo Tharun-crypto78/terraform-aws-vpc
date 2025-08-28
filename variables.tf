@@ -10,6 +10,18 @@ variable "cidr_block" {
     default = "10.0.0.0/16"
 }
 
+variable "instance_tenancy" {
+    default = "default"
+}
+
+variable "enable_dns_support" {
+    default = "true"
+}
+
+variable "enable_dns_hostnames" {
+    default = "true"
+}
+
 variable "vpc_tags" {
     type = map(string)
     default = {} # if we want to turn mandatory variable to optional then provide default as empty
@@ -21,7 +33,7 @@ variable "igw_tags" {
 }
 
 variable "public_subnet_cidrs" {
-    type = list(string)
+    type = list
 }
 
 variable "public_subnet_tags" {
@@ -30,7 +42,7 @@ variable "public_subnet_tags" {
 }
 
 variable "private_subnet_cidrs" {
-    type = list(string)
+    type = list
 }
 
 variable "private_subnet_tags" {
@@ -39,7 +51,7 @@ variable "private_subnet_tags" {
 }
 
 variable "database_subnet_cidrs" {
-    type = list(string)
+    type = list
 }
 
 variable "database_subnet_tags" {
@@ -47,12 +59,12 @@ variable "database_subnet_tags" {
     default = {}
 }
 
-variable "eip_tags" {
+variable "nat_eip" {
     type = map(string)
     default = {}
 }
 
-variable "nat_gateway_tags" {
+variable "nat_gateway" {
     type = map(string)
     default = {}
 }
@@ -73,7 +85,7 @@ variable "database_route_table_tags" {
 }
 
 variable "is_peering_required" {
-    default = false
+    default = "true"
 }
 
 variable "vpc_peering_tags" {
